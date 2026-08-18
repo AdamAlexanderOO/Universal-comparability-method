@@ -1,8 +1,80 @@
+# Dependencies
 node_modules/
-build/
-dist/
-coverage/
+/.pnp
+.pnp.js
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Testing
+/coverage
+.nyc_output
+
+# Production
+/build
+/dist
+/out
+
+# Misc
 .DS_Store
+.AppleDouble
+.LSOverride
 *.log
-.env*
-!.env.example
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.sublime-project
+.sublime-workspace
+*.iml
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Cache
+.eslintcache
+.prettierignore
+
+# Vite
+.vite/
+
+# Turbo
+.turbo/
+
+# TypeScript
+*.tsbuildinfo
+
+# Bun
+bun.lockb
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+logs/
+*.log
+
+# Temp
+tmp/
+temp/
+
+# Secrets
+secrets.json
+.aws/
+.gcp/
+
+# Build artifacts
+*.css.map
+*.js.map
