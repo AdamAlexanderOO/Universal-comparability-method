@@ -8,7 +8,8 @@ export type AppThemeId =
   | 'AMBER_TERMINAL'
   | 'EMERALD_SYNTH'
   | 'VIOLET_PHANTOM'
-  | 'SOLARIS_TITANIUM';
+  | 'SOLARIS_TITANIUM'
+  | 'CYBER_SAKURA_PINK';
 
 export interface AppThemeConfig {
   id: AppThemeId;
@@ -123,5 +124,21 @@ export const APP_THEMES: Record<AppThemeId, AppThemeConfig> = {
     bgDark: '#050505',
     bgPanel: '#0c0c0c',
     radarBeamGradient: 'conic-gradient(from 0deg, rgba(255, 255, 255, 0.4) 0deg, transparent 65deg)',
+  },
+  CYBER_SAKURA_PINK: {
+    id: 'CYBER_SAKURA_PINK',
+    name: 'CYBER SAKURA NEON PINK',
+    subtitle: 'Electric Hot Pink & Radiant Magenta Blossom',
+    primary: '#ff2a85',
+    primaryHover: '#e60067',
+    glow: '#ff2a85',
+    glowRgba: 'rgba(255, 42, 133, 0.45)',
+    accent: '#f472b6',
+    badgeBg: 'rgba(255, 42, 133, 0.15)',
+    borderPrimary: 'rgba(255, 42, 133, 0.5)',
+    textPrimary: '#ff2a85',
+    bgDark: '#12040b',
+    bgPanel: '#1d0713',
+    radarBeamGradient: 'conic-gradient(from 0deg, rgba(255, 42, 133, 0.45) 0deg, transparent 65deg)',
   },
 };

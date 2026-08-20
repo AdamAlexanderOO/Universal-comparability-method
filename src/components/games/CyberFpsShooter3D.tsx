@@ -181,7 +181,7 @@ export const CyberFpsShooter3D: React.FC<CyberFpsShooterProps> = ({
       primaryGlow: '#d946ef',
       groutIntensity: 40,
     });
-    const rifleMosaic = createLevel4MosaicTexture('HERO_MECH_FRONT', {
+    const rifleMosaic = createLevel4MosaicTexture('PLASMA_RIFLE', {
       tileSize: 3,
       tileStyle: 'QUANTUM_TRANSISTOR',
       primaryGlow: '#00f0ff',

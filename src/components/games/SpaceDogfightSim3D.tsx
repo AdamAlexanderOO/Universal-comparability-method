@@ -13,6 +13,12 @@ import {
   ArrowLeft,
   Maximize2,
   Minimize2,
+  Layers,
+  Grid,
+  Binary,
+  Activity,
+  Info,
+  X,
 } from 'lucide-react';
 import { sounds } from '../../utils/soundEffects';
 import { createLevel4MosaicTexture } from '../../utils/mosaicCharacterRenderer';
@@ -40,6 +46,11 @@ export const SpaceDogfightSim3D: React.FC<SpaceDogfightSimProps> = ({
   const [invertPitch, setInvertPitch] = useState<boolean>(false);
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const [enemiesRemaining, setEnemiesRemaining] = useState<number>(6);
+
+  // Roman Mosaic Building Overlay & Fidelity Scanner State
+  const [mosaicOverlayActive, setMosaicOverlayActive] = useState<boolean>(true);
+  const [mosaicFidelityTier, setMosaicFidelityTier] = useState<'300' | '200' | '150' | 'ULTRA'>('150');
+  const [showMosaicInspector, setShowMosaicInspector] = useState<boolean>(false);
 
   const gameRef = useRef<{
     scene: THREE.Scene;
@@ -176,7 +187,7 @@ export const SpaceDogfightSim3D: React.FC<SpaceDogfightSimProps> = ({
       primaryGlow: '#00f0ff',
       groutIntensity: 45,
     });
-    const cruiserMosaic = createLevel4MosaicTexture('GOLIATH_TITAN', {
+    const cruiserMosaic = createLevel4MosaicTexture('CRUISER_BOSS', {
       tileSize: 3,
       tileStyle: 'ROMAN_STONE',
       primaryGlow: '#ff0055',
@@ -849,6 +860,44 @@ export const SpaceDogfightSim3D: React.FC<SpaceDogfightSimProps> = ({
         </div>
 
         <div className="flex items-center gap-1.5 sm:gap-2 pointer-events-auto">
+          {/* Mosaic Matrix Overlay Toggle */}
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              const next = !mosaicOverlayActive;
+              setMosaicOverlayActive(next);
+              sounds.playClick(next ? 800 : 500);
+            }}
+            className={`px-2 py-1 rounded border text-[10px] font-bold tracking-wider flex items-center gap-1 transition-all ${
+              mosaicOverlayActive
+                ? 'bg-cyan-950/90 border-cyan-400 text-cyan-300 shadow-[0_0_10px_rgba(0,240,255,0.4)]'
+                : 'bg-white/5 border-white/20 text-neutral-400 hover:text-white'
+            }`}
+            title="Toggle Roman Mosaic Hologram Matrix Overlay (M)"
+          >
+            <Grid className="w-3 h-3 text-cyan-400" />
+            <span className="hidden sm:inline">{mosaicOverlayActive ? 'MOSAIC SCAN: ON' : 'MOSAIC: OFF'}</span>
+            <span className="sm:hidden">MOSAIC</span>
+          </button>
+
+          {/* Mosaic Hologram Inspector Modal Button */}
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              setShowMosaicInspector(true);
+              sounds.playSpectrumLoad();
+            }}
+            className="px-2 py-1 rounded border border-purple-500/50 bg-purple-950/70 hover:bg-purple-900 text-purple-200 text-[10px] font-bold tracking-wider flex items-center gap-1 transition-all"
+            title="Open Starfighter Roman Mosaic Diagnostics"
+          >
+            <Layers className="w-3 h-3 text-purple-400" />
+            <span className="hidden md:inline">DIAGNOSTICS</span>
+          </button>
+
           {/* Invert Pitch Toggle */}
           <button
             type="button"
@@ -907,6 +956,80 @@ export const SpaceDogfightSim3D: React.FC<SpaceDogfightSimProps> = ({
           </div>
         </div>
       </div>
+
+      {/* ROMAN MOSAIC MATRIX BUILDING OVERLAY */}
+      {mosaicOverlayActive && gameState === 'PLAYING' && (
+        <div className="absolute inset-0 pointer-events-none z-15 overflow-hidden">
+          {/* Subtle Grid Tessellation Lines */}
+          <div
+            className="absolute inset-0 opacity-15"
+            style={{
+              backgroundImage:
+                'linear-gradient(to right, rgba(0, 240, 255, 0.3) 1px, transparent 1px), linear-gradient(to bottom, rgba(0, 240, 255, 0.3) 1px, transparent 1px)',
+              backgroundSize: mosaicFidelityTier === '300' ? '36px 36px' : mosaicFidelityTier === '200' ? '18px 18px' : '8px 8px',
+            }}
+          />
+
+          {/* Top-Right Mosaic Telemetry Box */}
+          <div className="absolute top-16 right-4 sm:right-6 pointer-events-auto bg-black/80 border border-cyan-500/40 p-2.5 rounded-lg backdrop-blur-md text-[10px] text-cyan-300 font-mono space-y-1 shadow-lg max-w-[210px]">
+            <div className="flex items-center justify-between font-bold border-b border-cyan-500/30 pb-1">
+              <span className="flex items-center gap-1">
+                <Grid className="w-3 h-3 text-cyan-400" />
+                MOSAIC MATRIX SCAN
+              </span>
+              <span className="text-[9px] px-1 py-0.2 rounded bg-cyan-500/20 text-cyan-200">
+                {mosaicFidelityTier}
+              </span>
+            </div>
+            <div className="text-neutral-400 text-[9px]">
+              Tesserae Grid: <b className="text-white">{mosaicFidelityTier === '300' ? '36px Macro' : mosaicFidelityTier === '200' ? '18px Meso' : '8px Micro'}</b>
+            </div>
+            <div className="text-neutral-400 text-[9px]">
+              Active Tiles: <b className="text-emerald-400">4,820</b> • Grout: <b className="text-white">Nominal</b>
+            </div>
+
+            {/* Quick Tier Select */}
+            <div className="grid grid-cols-4 gap-1 pt-1">
+              {(['300', '200', '150', 'ULTRA'] as const).map((tier) => (
+                <button
+                  type="button"
+                  key={tier}
+                  onClick={() => {
+                    setMosaicFidelityTier(tier);
+                    sounds.playClick(600);
+                  }}
+                  className={`px-1 py-0.5 rounded text-[8px] font-bold border transition-all ${
+                    mosaicFidelityTier === tier
+                      ? 'bg-cyan-500 text-black border-cyan-300'
+                      : 'bg-white/5 border-white/10 text-neutral-400 hover:text-white'
+                  }`}
+                >
+                  {tier}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Target Hostile Tessera Decomposition Box */}
+          {targetLock && (
+            <div className="absolute top-44 left-4 sm:left-6 bg-red-950/85 border border-red-500/60 p-2 rounded-lg backdrop-blur-md text-[10px] font-mono text-red-300 space-y-1 animate-pulse shadow-[0_0_15px_rgba(239,68,68,0.4)] max-w-[200px]">
+              <div className="font-bold flex items-center gap-1 text-white border-b border-red-500/30 pb-0.5 text-[9px]">
+                <Activity className="w-3 h-3 text-red-400" />
+                <span>TARGET TESSELLATION SCAN</span>
+              </div>
+              <div className="text-[9px] text-neutral-300">
+                Hostile Hull: <b className="text-red-200">{targetLock}</b>
+              </div>
+              <div className="text-[9px] text-neutral-300">
+                Tesserae Density: <b className="text-amber-400">1,480 Stone Blocks</b>
+              </div>
+              <div className="text-[9px] text-neutral-300">
+                SSIM Match: <b className="text-emerald-400">98.2%</b>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* FLIGHT RETICLE & RADAR LOCK */}
       {gameState === 'PLAYING' && (
@@ -1173,6 +1296,116 @@ export const SpaceDogfightSim3D: React.FC<SpaceDogfightSimProps> = ({
               </div>
             </div>
           )}
+        </div>
+      )}
+
+      {/* STARFIGHTER ROMAN MOSAIC DIAGNOSTICS MODAL */}
+      {showMosaicInspector && (
+        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="bg-[#050711] border border-cyan-500/40 rounded-xl max-w-2xl w-full p-4 sm:p-6 space-y-4 text-white shadow-2xl font-mono relative animate-in fade-in zoom-in-95 duration-200">
+            {/* Header */}
+            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 rounded bg-cyan-950 border border-cyan-500/40 text-cyan-400">
+                  <Layers className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-sm sm:text-base text-white">
+                    STARFIGHTER ROMAN MOSAIC DIAGNOSTICS
+                  </h3>
+                  <div className="text-[10px] text-neutral-400">
+                    Vanguard Interceptor 300→200→150 Tessellation Engine Decomposition
+                  </div>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowMosaicInspector(false);
+                  sounds.playClick(500);
+                }}
+                className="p-1.5 rounded bg-white/10 hover:bg-white/20 text-neutral-300 hover:text-white"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Vessel Grid & Blueprint View */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="relative rounded-lg overflow-hidden border border-cyan-500/30 bg-black/60 aspect-video">
+                <img
+                  src="/src/assets/images/space_starfighter_hero_1787089887255.jpg"
+                  alt="Vanguard Starfighter Interceptor"
+                  referrerPolicy="no-referrer"
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-cyan-950/20 pointer-events-none" />
+                <div className="absolute top-2 left-2 px-2 py-0.5 bg-black/80 rounded border border-cyan-400/40 text-[9px] text-cyan-300 font-bold">
+                  PLAYABLE STARFIGHTER
+                </div>
+                <div className="absolute bottom-2 left-2 right-2 flex justify-between text-[8px] bg-black/80 p-1 rounded border border-white/15 text-neutral-300">
+                  <span>TIER: 150 MICRO</span>
+                  <span className="text-cyan-300 font-bold">2,840 TESSERAE</span>
+                </div>
+              </div>
+
+              <div className="relative rounded-lg overflow-hidden border border-red-500/30 bg-black/60 aspect-video">
+                <img
+                  src="/src/assets/images/enemy_cruiser_boss_1787090414452.jpg"
+                  alt="Capital Battlecruiser"
+                  referrerPolicy="no-referrer"
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-red-950/20 pointer-events-none" />
+                <div className="absolute top-2 left-2 px-2 py-0.5 bg-black/80 rounded border border-red-400/40 text-[9px] text-red-300 font-bold">
+                  BOSS DREADNOUGHT
+                </div>
+                <div className="absolute bottom-2 left-2 right-2 flex justify-between text-[8px] bg-black/80 p-1 rounded border border-white/15 text-neutral-300">
+                  <span>TIER: 300 MACRO</span>
+                  <span className="text-red-300 font-bold">6,400 TESSERAE</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Resolution Tier Breakdown */}
+            <div className="p-3 bg-white/[0.02] border border-white/10 rounded-lg space-y-2 text-xs">
+              <div className="flex items-center justify-between text-neutral-300 font-bold">
+                <span>ACTIVE MOSAIC RESOLUTION HIERARCHY</span>
+                <span className="text-cyan-400">TIER {mosaicFidelityTier}</span>
+              </div>
+              <div className="grid grid-cols-3 gap-2 text-[10px]">
+                <div className="p-2 rounded bg-black/50 border border-cyan-500/20">
+                  <div className="text-cyan-300 font-bold">300 SCALE</div>
+                  <div className="text-neutral-400">Macro Stone Plates (36px)</div>
+                  <div className="text-emerald-400 mt-1">Hull Armor Shell</div>
+                </div>
+                <div className="p-2 rounded bg-black/50 border border-blue-500/20">
+                  <div className="text-blue-300 font-bold">200 SCALE</div>
+                  <div className="text-neutral-400">Meso Interpolation (18px)</div>
+                  <div className="text-emerald-400 mt-1">Wing Leading Edge</div>
+                </div>
+                <div className="p-2 rounded bg-black/50 border border-purple-500/20">
+                  <div className="text-purple-300 font-bold">150 SCALE</div>
+                  <div className="text-neutral-400">Quantum Transistors (8px)</div>
+                  <div className="text-emerald-400 mt-1">Plasma Thruster Jets</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Footer Action */}
+            <div className="flex justify-end pt-1">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowMosaicInspector(false);
+                  sounds.playClick(600);
+                }}
+                className="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-black font-bold text-xs rounded transition-all shadow-[0_0_12px_rgba(0,240,255,0.5)]"
+              >
+                RETURN TO COCKPIT
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

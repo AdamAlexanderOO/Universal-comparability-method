@@ -119,6 +119,15 @@ const LIGHT_PRESETS: Record<LightPreset, LightProtocolData> = {
     energyOutputMW: 195.1,
     activePathways: ['Core -> Alloy Chassis', 'Core -> Chrono Escapement'],
   },
+  SAKURA_PINK: {
+    preset: 'SAKURA_PINK',
+    name: 'CYBER SAKURA PINK',
+    primaryColor: '#ff2a85',
+    glowColor: '#ff2a85',
+    wavelengthTHz: 410,
+    energyOutputMW: 215.4,
+    activePathways: ['Core -> Plasma Conduit', 'Core -> Mosaic Tesserae Matrix'],
+  },
 };
 
 export type MobileTab =

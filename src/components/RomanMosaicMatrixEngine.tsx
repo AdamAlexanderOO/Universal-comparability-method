@@ -33,11 +33,12 @@ interface RomanMosaicEngineProps {
   theme: AppThemeConfig;
 }
 
-// Characteristic Pre-built Image Profiles
+// Characteristic Pre-built Image Profiles - In-Game Playable Characters, Bosses, Weapons & Sprites
 interface KnownImageProfile {
   id: string;
   name: string;
   category: string;
+  gameRole: 'PLAYABLE' | 'PILOT' | 'WEAPON' | 'BOSS' | 'ENEMY' | 'RELIC';
   src: string;
   dominantColors: string[];
   characteristicLines: string[];
@@ -48,48 +49,136 @@ interface KnownImageProfile {
 
 const PRESET_PROFILES: KnownImageProfile[] = [
   {
-    id: 'ROMAN_CYBER_MOSAIC',
-    name: 'Imperium Tesserae Visage',
-    category: 'Ancient Cyber-Relic',
-    src: '/src/assets/images/roman_cyber_mosaic_1787188021928.jpg',
-    dominantColors: ['#f59e0b', '#dc2626', '#1e293b', '#38bdf8'],
-    characteristicLines: ['Arch of Titus Curve (32°)', 'Grout Matrix Grid 4x4', 'Visor Horizontal Cut', 'Crown Tesserae Radial'],
-    complexityIndex: 94,
-    equationsCount: 312,
-    description: 'Ancient Roman mosaic tesserae hybridized with quantum transistor routing paths.',
-  },
-  {
-    id: 'MECH_HERO',
-    name: 'Assault Mech Prime',
-    category: 'Combat Rig',
+    id: 'MECH_HERO_FRONT',
+    name: 'Assault Mech Prime (Front)',
+    category: 'Playable TPS Operative',
+    gameRole: 'PLAYABLE',
     src: '/src/assets/images/player_mech_hero_1787187990637.jpg',
     dominantColors: ['#00f0ff', '#1e3a8a', '#94a3b8', '#ef4444'],
     characteristicLines: ['Vertical Torso Spine (90°)', 'Shoulder Pod Diagonals (45°)', 'Visor Slit Horizon (0°)', 'Leg Actuator V-Form (60°)'],
-    complexityIndex: 88,
-    equationsCount: 264,
-    description: 'Heavy tactical mech armor with high-contrast edge vector contours.',
+    complexityIndex: 92,
+    equationsCount: 310,
+    description: 'In-game playable combat mech operative featuring heavy Roman stone tesserae and cyan plasma chest conduit.',
   },
   {
-    id: 'SPACE_FIGHTER',
-    name: 'Vanguard Starfighter',
-    category: 'Aeronautic Craft',
+    id: 'MECH_HERO_REAR',
+    name: 'Assault Mech Prime (Rear / Thrusters)',
+    category: 'Playable TPS Operative',
+    gameRole: 'PLAYABLE',
+    src: '/src/assets/images/player_mech_rear_1787188006708.jpg',
+    dominantColors: ['#00f0ff', '#0f172a', '#3b82f6', '#f59e0b'],
+    characteristicLines: ['Twin Ion Thruster Bell (r=18)', 'Spinal Heat Exchanger Grid', 'Shoulder Shield Contour', 'Calf Stabilizer Fin (75°)'],
+    complexityIndex: 94,
+    equationsCount: 335,
+    description: 'In-game player mech rear perspective featuring twin ion afterburners and quantum transistor heatsinks.',
+  },
+  {
+    id: 'SPACE_FIGHTER_HERO',
+    name: 'Vanguard Starfighter Interceptor',
+    category: 'Playable 3D Space Craft',
+    gameRole: 'PLAYABLE',
     src: '/src/assets/images/space_starfighter_hero_1787089887255.jpg',
     dominantColors: ['#38bdf8', '#0284c7', '#0f172a', '#fbbf24'],
     characteristicLines: ['Delta Wing Sweeps (35°)', 'Twin Thruster Vectors', 'Cockpit Canopy Ellipse', 'Plasma Core Axial'],
-    complexityIndex: 82,
-    equationsCount: 218,
-    description: 'Aerodynamic vector chassis characterized by sweeping delta lines and twin ion flare.',
+    complexityIndex: 88,
+    equationsCount: 280,
+    description: 'In-game player starfighter vessel in Space Dogfight Sim with sweeping aerodynamic vector chassis.',
   },
   {
-    id: 'CYBER_PILOT',
+    id: 'CYBER_PILOT_HERO',
     name: 'Neural Pilot Operator',
-    category: 'Bio-Cybernetic',
+    category: 'Player Bio-Cyber Avatar',
+    gameRole: 'PILOT',
     src: '/src/assets/images/cyber_pilot_hero_1787089924400.jpg',
     dominantColors: ['#a855f7', '#ec4899', '#0f172a', '#06b6d4'],
     characteristicLines: ['HUD Reticle Circle (r=42)', 'Synaptic Cervical Arc', 'Visor Reflection Band', 'Collar Trace Segment'],
     complexityIndex: 91,
     equationsCount: 290,
-    description: 'Biometric sensory portrait mapped onto 300/200/150 hierarchical cipher coordinates.',
+    description: 'In-game neural pilot operator with biometric sensory portrait mapped onto hierarchical cipher coordinates.',
+  },
+  {
+    id: 'CYBER_MECH_ARMOR',
+    name: 'Tactical Mech Armor Core',
+    category: 'Player Armor Rig',
+    gameRole: 'PLAYABLE',
+    src: '/src/assets/images/cyber_mech_armor_1787089900058.jpg',
+    dominantColors: ['#38bdf8', '#1e293b', '#64748b', '#00f0ff'],
+    characteristicLines: ['Pectoral Chobham Angles (48°)', 'Nanite Grout Seam', 'Reactor Core Well', 'Pauldrons Bevel Trace'],
+    complexityIndex: 89,
+    equationsCount: 275,
+    description: 'In-game reinforced chassis plate loadout for high-impact tactical operations.',
+  },
+  {
+    id: 'PLASMA_RIFLE',
+    name: 'Ion Plasma Rifle',
+    category: 'Player Primary Weapon',
+    gameRole: 'WEAPON',
+    src: '/src/assets/images/cyber_plasma_rifle_1787089913135.jpg',
+    dominantColors: ['#00f0ff', '#1e1b4b', '#0369a1', '#f43f5e'],
+    characteristicLines: ['Barrel Magnetic Rails (0°)', 'Optic Hologram Scope (r=24)', 'Receiver Heat Vent Stack', 'Grip Angular Ergonomics'],
+    complexityIndex: 86,
+    equationsCount: 250,
+    description: 'In-game first-person pulse rifle weapon sprite rendered with transistor micro-circuitry.',
+  },
+  {
+    id: 'GOLIATH_BOSS',
+    name: 'Goliath Titan Boss',
+    category: 'Rogue Heavy Siege Mech',
+    gameRole: 'BOSS',
+    src: '/src/assets/images/enemy_tps_mech_1787090446411.jpg',
+    dominantColors: ['#ef4444', '#7f1d1d', '#18181b', '#f59e0b'],
+    characteristicLines: ['Armor Horn Angulation (55°)', 'Central Core Arc (r=35)', 'Leg Piston Vectors', 'Shoulder Missile Battery Grid'],
+    complexityIndex: 96,
+    equationsCount: 340,
+    description: 'In-game heavy bipedal boss encounter rendered with Roman stone tesserae and molten crimson conduits.',
+  },
+  {
+    id: 'SENTINEL_DROID',
+    name: 'Combat Sentinel Droid',
+    category: 'Autonomous Security Unit',
+    gameRole: 'ENEMY',
+    src: '/src/assets/images/enemy_fps_sentinel_1787090428781.jpg',
+    dominantColors: ['#d946ef', '#4a044e', '#38bdf8', '#ff0055'],
+    characteristicLines: ['Hexagonal Shell Array (60°)', 'Ocular Optic Trace', 'Hover Thruster Field', 'EMP Deflector Loop'],
+    complexityIndex: 90,
+    equationsCount: 280,
+    description: 'In-game hover combat droid with quantum transistor gate matrix and amethyst optics.',
+  },
+  {
+    id: 'DRONE_FIGHTER',
+    name: 'Tri-Rotor Recon Drone',
+    category: 'Fast Attack Combat Drone',
+    gameRole: 'ENEMY',
+    src: '/src/assets/images/enemy_drone_fighter_1787090400681.jpg',
+    dominantColors: ['#06b6d4', '#0f172a', '#22d3ee', '#e11d48'],
+    characteristicLines: ['Tri-Rotor Y-Form (120°)', 'Pylon Strut Radians', 'Sensor Turret Bulb', 'Exhaust Ion Nozzle'],
+    complexityIndex: 85,
+    equationsCount: 240,
+    description: 'In-game aerial skirmish drone with high agility vector tracking.',
+  },
+  {
+    id: 'CRUISER_BOSS',
+    name: 'Armada Battlecruiser Flagship',
+    category: 'Capital Dreadnought Boss',
+    gameRole: 'BOSS',
+    src: '/src/assets/images/enemy_cruiser_boss_1787090414452.jpg',
+    dominantColors: ['#dc2626', '#450a0a', '#172554', '#fbbf24'],
+    characteristicLines: ['Spine Catwalk Keel (0°)', 'Superstructure Tier Steps', 'Main Turret Ring Array', 'Broadside Flak Ports'],
+    complexityIndex: 98,
+    equationsCount: 390,
+    description: 'In-game boss dreadnought in Space Dogfight Sim with massive capital hull armor tesserae.',
+  },
+  {
+    id: 'ROMAN_CYBER_MOSAIC',
+    name: 'Imperium Tesserae Visage',
+    category: 'Ancient Cyber-Relic Core',
+    gameRole: 'RELIC',
+    src: '/src/assets/images/roman_cyber_mosaic_1787188021928.jpg',
+    dominantColors: ['#f59e0b', '#dc2626', '#1e293b', '#38bdf8'],
+    characteristicLines: ['Arch of Titus Curve (32°)', 'Grout Matrix Grid 4x4', 'Visor Horizontal Cut', 'Crown Tesserae Radial'],
+    complexityIndex: 95,
+    equationsCount: 320,
+    description: 'Ancient Roman mosaic tesserae hybridized with quantum transistor routing paths.',
   },
 ];
 
@@ -108,13 +197,15 @@ export const RomanMosaicMatrixEngine: React.FC<RomanMosaicEngineProps> = ({
   const [isPanning, setIsPanning] = useState<boolean>(false);
   const [panStart, setPanStart] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
 
-  // Resolution Hierarchy
-  // 1: Macro Level (300 scale - large block tesserae)
-  // 2: Meso Level (200 scale - medium stone tiles & edge interpolation)
-  // 3: Micro Level (150 scale - fine transistor cipher & sub-pixel fidelity)
-  // 4: Ultra Level (Full continuous fidelity)
+  // Fidelity Slider & Resolution Tier State
+  // 300: Macro Level (36px coarse stone blocks)
+  // 200: Meso Level (18px stone tiles & edge interpolation)
+  // 150: Micro Level (8px fine quantum transistor gates)
+  // 50 / Ultra: (3px sub-pixel ultra continuous matrix)
+  const [fidelityTier, setFidelityTier] = useState<number>(300);
+  const [totalTesseraeCount, setTotalTesseraeCount] = useState<number>(560);
   const [hierarchyLevel, setHierarchyLevel] = useState<number>(1);
-  const [isAutoRefining, setIsAutoRefining] = useState<boolean>(true);
+  const [isAutoRefining, setIsAutoRefining] = useState<boolean>(false);
   const [selectedProfile, setSelectedProfile] = useState<KnownImageProfile>(PRESET_PROFILES[0]);
   const [tileStyle, setTileStyle] = useState<'ROMAN_STONE' | 'QUANTUM_TRANSISTOR' | 'GLYPH_CIPHER' | 'NEON_CIRCUIT'>('ROMAN_STONE');
   const [groutIntensity, setGroutIntensity] = useState<number>(75);
@@ -122,13 +213,13 @@ export const RomanMosaicMatrixEngine: React.FC<RomanMosaicEngineProps> = ({
   const [showVectorLines, setShowVectorLines] = useState<boolean>(true);
   const [showGlyphMatrix, setShowGlyphMatrix] = useState<boolean>(false);
   const [similarityScore, setSimilarityScore] = useState<number>(96.4);
-  const [recognizedCategory, setRecognizedCategory] = useState<string>('Ancient Cyber-Relic');
+  const [recognizedCategory, setRecognizedCategory] = useState<string>('Playable TPS Operative');
   const [customImageSrc, setCustomImageSrc] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'MOSAIC_VIEW' | 'DRAW_STUDIO' | 'CIPHER_HIERARCHY'>('MOSAIC_VIEW');
   const [cipherHierarchy, setCipherHierarchy] = useState<{ scale300: string; scale200: string; scale150: string }>({
-    scale300: '0xROMAN_MACRO // TESSERAE_BASE_300_BLOCKS',
-    scale200: '0xCYPHER_MESO // VECTOR_INTERPOLATION_200_LINES',
-    scale150: '0xTRANSISTOR_MICRO // QUANTUM_150_DIGITS_RESOLVED',
+    scale300: '0xROMAN_MACRO // TESSERAE_BASE_300_BLOCKS [36px Grid]',
+    scale200: '0xCYPHER_MESO // VECTOR_INTERPOLATION_200_LINES [18px Grid]',
+    scale150: '0xTRANSISTOR_MICRO // QUANTUM_150_DIGITS_RESOLVED [8px Grid]',
   });
   const [isDrawing, setIsDrawing] = useState<boolean>(false);
   const [brushColor, setBrushColor] = useState<string>('#00f0ff');
@@ -138,22 +229,38 @@ export const RomanMosaicMatrixEngine: React.FC<RomanMosaicEngineProps> = ({
   useEffect(() => {
     if (!isAutoRefining || !powerOn) return;
     const interval = setInterval(() => {
-      setHierarchyLevel((prev) => {
-        const next = (prev % 4) + 1;
-        if (next === 1) {
+      setFidelityTier((prev) => {
+        let nextTier = 300;
+        let nextLvl = 1;
+        if (prev >= 260) {
+          nextTier = 200;
+          nextLvl = 2;
+        } else if (prev >= 175) {
+          nextTier = 150;
+          nextLvl = 3;
+        } else if (prev >= 100) {
+          nextTier = 50;
+          nextLvl = 4;
+        } else {
+          nextTier = 300;
+          nextLvl = 1;
+        }
+
+        setHierarchyLevel(nextLvl);
+        if (nextTier === 300) {
           sounds.playLaserPew();
-        } else if (next === 4) {
+        } else if (nextTier === 50) {
           sounds.playSpectrumLoad();
         } else {
-          sounds.playClick(600 + next * 80);
+          sounds.playClick(600 + nextLvl * 80);
         }
-        return next;
+        return nextTier;
       });
-    }, 1800);
+    }, 2000);
     return () => clearInterval(interval);
   }, [isAutoRefining, powerOn]);
 
-  // Main Canvas Mosaic Rendering Engine
+  // Main Canvas Mosaic Rendering Engine - Reacts dynamically to Fidelity Slider (300, 200, 150, 50/Ultra)
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas || !powerOn) return;
@@ -169,15 +276,25 @@ export const RomanMosaicMatrixEngine: React.FC<RomanMosaicEngineProps> = ({
       const h = canvas.height;
       ctx.clearRect(0, 0, w, h);
 
-      // Determine mosaic grid tile size based on hierarchy level and optical zoom scale
-      // Level 1: 300 scale -> coarse tiles (approx 36px - 44px)
-      // Level 2: 200 scale -> medium tiles (approx 18px - 22px)
-      // Level 3: 150 scale -> fine tiles (approx 8px - 10px)
-      // Level 4: Ultra -> micro tiles (approx 3px - 4px)
+      // Determine mosaic grid tile size dynamically based on Fidelity Slider Tier
+      // Tier 300: Macro Level -> coarse tiles (approx 36px)
+      // Tier 200: Meso Level -> medium tiles (approx 18px)
+      // Tier 150: Micro Level -> fine tiles (approx 8px)
+      // Tier 50 / Ultra: Ultra Level -> micro tiles (approx 3px)
       let baseTileSize = 36;
-      if (hierarchyLevel === 2) baseTileSize = 18;
-      if (hierarchyLevel === 3) baseTileSize = 8;
-      if (hierarchyLevel === 4) baseTileSize = 3;
+      if (fidelityTier <= 75) {
+        baseTileSize = 3;
+      } else if (fidelityTier <= 165) {
+        baseTileSize = 8;
+      } else if (fidelityTier <= 245) {
+        baseTileSize = 18;
+      } else {
+        baseTileSize = 36;
+      }
+
+      const calculatedCols = Math.ceil(w / baseTileSize);
+      const calculatedRows = Math.ceil(h / baseTileSize);
+      setTotalTesseraeCount(calculatedCols * calculatedRows);
 
       // Adjust effective rendered tile size according to active multi-level zoom
       const tileSize = Math.max(2, Math.round(baseTileSize * zoomLevel));
@@ -201,8 +318,8 @@ export const RomanMosaicMatrixEngine: React.FC<RomanMosaicEngineProps> = ({
       }
 
       // Render Mosaic Tesserae / Transistor Blocks
-      const cols = Math.ceil(w / baseTileSize);
-      const rows = Math.ceil(h / baseTileSize);
+      const cols = calculatedCols;
+      const rows = calculatedRows;
 
       for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
@@ -336,6 +453,7 @@ export const RomanMosaicMatrixEngine: React.FC<RomanMosaicEngineProps> = ({
     powerOn,
     selectedProfile,
     customImageSrc,
+    fidelityTier,
     hierarchyLevel,
     zoomLevel,
     panOffset,
@@ -645,61 +763,132 @@ export const RomanMosaicMatrixEngine: React.FC<RomanMosaicEngineProps> = ({
               </div>
             </div>
 
-            {/* Progressive Playback & Hierarchy Controls */}
-            <div className="flex flex-wrap items-center justify-between gap-2 p-2.5 bg-white/[0.03] border border-white/10 rounded-lg">
-              <div className="flex items-center gap-1.5">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsAutoRefining(!isAutoRefining);
-                    sounds.playClick(700);
-                    haptics.trigger('click');
-                  }}
-                  className="px-3 py-1.5 rounded bg-white/10 hover:bg-white/15 border border-white/15 text-xs font-mono font-bold flex items-center gap-1.5"
-                >
-                  {isAutoRefining ? <Pause className="w-3.5 h-3.5 text-amber-400" /> : <Play className="w-3.5 h-3.5 text-emerald-400" />}
-                  <span>{isAutoRefining ? 'Pause Progressive Cycle' : 'Auto Step Refine'}</span>
-                </button>
+            {/* Progressive Playback & Fidelity Slider Controls */}
+            <div className="p-3 bg-white/[0.03] border border-white/10 rounded-lg space-y-3">
+              {/* Top Slider Header & Stats */}
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <div className="p-1 rounded bg-cyan-950 border border-cyan-500/30 text-cyan-400">
+                    <Sliders className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <div className="text-xs font-mono font-bold text-white flex items-center gap-1.5">
+                      <span>MOSAIC RESOLUTION FIDELITY SLIDER</span>
+                      <span className="px-1.5 py-0.5 rounded text-[10px] bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                        TIER {fidelityTier} ({fidelityTier >= 260 ? '300 MACRO' : fidelityTier >= 180 ? '200 MESO' : fidelityTier >= 100 ? '150 MICRO' : 'ULTRA 50'})
+                      </span>
+                    </div>
+                    <div className="text-[10px] font-mono text-neutral-400">
+                      Active Tesserae: <b className="text-cyan-300">{totalTesseraeCount.toLocaleString()}</b> • Grid:{' '}
+                      <b className="text-white">
+                        {fidelityTier <= 75 ? '3px Micro' : fidelityTier <= 165 ? '8px Gate' : fidelityTier <= 245 ? '18px Tile' : '36px Block'}
+                      </b>{' '}
+                      • Equations: <b className="text-amber-400">{Math.round(selectedProfile.equationsCount * (300 / Math.max(50, fidelityTier)))}</b>
+                    </div>
+                  </div>
+                </div>
 
-                {/* Direct Level Buttons */}
-                {[1, 2, 3, 4].map((lvl) => (
+                <div className="flex items-center gap-1.5">
                   <button
                     type="button"
-                    key={lvl}
                     onClick={() => {
-                      setHierarchyLevel(lvl);
-                      sounds.playClick(600 + lvl * 100);
-                      haptics.trigger('light');
+                      setIsAutoRefining(!isAutoRefining);
+                      sounds.playClick(700);
+                      haptics.trigger('click');
                     }}
-                    className={`px-2.5 py-1 text-xs font-mono font-bold rounded border transition-all ${
-                      hierarchyLevel === lvl ? 'text-white border-transparent' : 'bg-white/5 border-white/10 text-neutral-400 hover:text-white'
-                    }`}
-                    style={{
-                      backgroundColor: hierarchyLevel === lvl ? theme.primary : undefined,
-                    }}
+                    className="px-2.5 py-1 rounded bg-white/10 hover:bg-white/15 border border-white/15 text-[11px] font-mono font-bold flex items-center gap-1.5"
                   >
-                    L{lvl} ({lvl === 1 ? '300' : lvl === 2 ? '200' : lvl === 3 ? '150' : 'Ultra'})
+                    {isAutoRefining ? <Pause className="w-3.5 h-3.5 text-amber-400" /> : <Play className="w-3.5 h-3.5 text-emerald-400" />}
+                    <span>{isAutoRefining ? 'Pause Cycle' : 'Auto Cycle'}</span>
                   </button>
-                ))}
+
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileUpload}
+                    accept="image/*"
+                    className="hidden"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="px-2 py-1 rounded bg-white/10 hover:bg-white/15 border border-white/15 text-[11px] font-mono font-bold flex items-center gap-1 text-neutral-200"
+                    title="Upload Custom Image to Analyze"
+                  >
+                    <Upload className="w-3.5 h-3.5" />
+                    <span>Upload</span>
+                  </button>
+                </div>
               </div>
 
-              {/* Upload Custom Image for Analysis */}
-              <div>
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  onChange={handleFileUpload}
-                  accept="image/*"
-                  className="hidden"
-                />
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="px-2.5 py-1.5 rounded bg-white/10 hover:bg-white/15 border border-white/15 text-xs font-mono font-bold flex items-center gap-1.5 text-neutral-200"
-                >
-                  <Upload className="w-3.5 h-3.5" />
-                  <span>Upload & Classify</span>
-                </button>
+              {/* Fidelity Slider Track with Tier Markers */}
+              <div className="space-y-1.5">
+                <div className="flex justify-between text-[10px] font-mono text-neutral-400">
+                  <span className="text-cyan-400 font-bold">◄ 300 (Macro Stone)</span>
+                  <span className="text-blue-400 font-bold">200 (Meso Line)</span>
+                  <span className="text-purple-400 font-bold">150 (Micro Transistor)</span>
+                  <span className="text-emerald-400 font-bold">50 (Ultra Continuous) ►</span>
+                </div>
+
+                <div className="relative flex items-center">
+                  <input
+                    type="range"
+                    min={50}
+                    max={300}
+                    step={5}
+                    value={fidelityTier}
+                    onChange={(e) => {
+                      const val = Number(e.target.value);
+                      setFidelityTier(val);
+                      setIsAutoRefining(false);
+                      if (val >= 260) setHierarchyLevel(1);
+                      else if (val >= 180) setHierarchyLevel(2);
+                      else if (val >= 100) setHierarchyLevel(3);
+                      else setHierarchyLevel(4);
+                      sounds.playClick(500 + (300 - val) * 2);
+                      haptics.trigger('light');
+                    }}
+                    className="w-full h-2.5 bg-neutral-800 rounded-lg appearance-none cursor-pointer accent-cyan-400 shadow-inner"
+                  />
+                </div>
+
+                {/* Quick Snap Preset Buttons */}
+                <div className="grid grid-cols-4 gap-1.5 pt-1">
+                  {[
+                    { tier: 300, label: '300 MACRO', level: 1, desc: '36px Blocks' },
+                    { tier: 200, label: '200 MESO', level: 2, desc: '18px Tiles' },
+                    { tier: 150, label: '150 MICRO', level: 3, desc: '8px Transistors' },
+                    { tier: 50, label: '50 ULTRA', level: 4, desc: '3px Micro-Matrix' },
+                  ].map((preset) => {
+                    const isActive =
+                      (preset.tier === 300 && fidelityTier >= 260) ||
+                      (preset.tier === 200 && fidelityTier >= 180 && fidelityTier < 260) ||
+                      (preset.tier === 150 && fidelityTier >= 100 && fidelityTier < 180) ||
+                      (preset.tier === 50 && fidelityTier < 100);
+
+                    return (
+                      <button
+                        type="button"
+                        key={preset.tier}
+                        onClick={() => {
+                          setFidelityTier(preset.tier);
+                          setHierarchyLevel(preset.level);
+                          setIsAutoRefining(false);
+                          sounds.playClick(600 + preset.level * 100);
+                          haptics.trigger('medium');
+                        }}
+                        className={`px-2 py-1.5 rounded text-xs font-mono font-bold border transition-all text-center ${
+                          isActive
+                            ? 'text-white border-cyan-400 bg-cyan-950/80 shadow-[0_0_12px_rgba(0,240,255,0.3)]'
+                            : 'bg-white/5 border-white/10 text-neutral-400 hover:text-white hover:border-white/20'
+                        }`}
+                      >
+                        <div>{preset.label}</div>
+                        <div className="text-[9px] text-neutral-400 font-normal">{preset.desc}</div>
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
             </div>
           </div>
@@ -783,12 +972,26 @@ export const RomanMosaicMatrixEngine: React.FC<RomanMosaicEngineProps> = ({
 
             {/* Pre-Built Characteristic Memory Profiles */}
             <div className="p-3 bg-white/[0.02] border border-white/10 rounded-lg space-y-2.5">
-              <div className="text-xs font-mono font-bold text-neutral-300 uppercase tracking-wider">
-                Pre-Built Characteristic Profiles
+              <div className="flex items-center justify-between">
+                <div className="text-xs font-mono font-bold text-neutral-300 uppercase tracking-wider">
+                  In-Game Sprites & Character Profiles
+                </div>
+                <span className="text-[10px] font-mono text-cyan-400 font-bold">{PRESET_PROFILES.length} ASSETS</span>
               </div>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-2 gap-2 max-h-[300px] overflow-y-auto pr-1">
                 {PRESET_PROFILES.map((p) => {
                   const isSelected = selectedProfile.id === p.id && !customImageSrc;
+                  const roleBadgeColor =
+                    p.gameRole === 'PLAYABLE' || p.gameRole === 'PILOT'
+                      ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40'
+                      : p.gameRole === 'WEAPON'
+                      ? 'bg-blue-500/20 text-blue-300 border-blue-500/40'
+                      : p.gameRole === 'BOSS'
+                      ? 'bg-red-500/20 text-red-300 border-red-500/40'
+                      : p.gameRole === 'ENEMY'
+                      ? 'bg-purple-500/20 text-purple-300 border-purple-500/40'
+                      : 'bg-amber-500/20 text-amber-300 border-amber-500/40';
+
                   return (
                     <button
                       type="button"
@@ -796,24 +999,29 @@ export const RomanMosaicMatrixEngine: React.FC<RomanMosaicEngineProps> = ({
                       onClick={() => handleSelectPreset(p)}
                       className={`p-2 rounded border text-left transition-all relative overflow-hidden group ${
                         isSelected
-                          ? 'border-cyan-400 bg-cyan-950/40'
+                          ? 'border-cyan-400 bg-cyan-950/60 shadow-[0_0_10px_rgba(0,240,255,0.2)]'
                           : 'border-white/10 bg-white/5 hover:border-white/20'
                       }`}
                     >
-                      <div className="flex items-center gap-1.5">
+                      <div className="flex items-center gap-2">
                         <img
                           src={p.src}
                           alt={p.name}
                           referrerPolicy="no-referrer"
-                          className="w-8 h-8 rounded object-cover border border-white/20 shrink-0"
+                          className="w-10 h-10 rounded object-cover border border-white/20 shrink-0"
                         />
-                        <div className="overflow-hidden">
+                        <div className="overflow-hidden min-w-0">
                           <div className="text-[11px] font-bold truncate text-white">{p.name}</div>
-                          <div className="text-[9px] text-neutral-400 truncate">{p.category}</div>
+                          <div className="flex items-center gap-1 mt-0.5">
+                            <span className={`text-[8px] font-mono px-1 py-0.2 rounded border font-bold ${roleBadgeColor}`}>
+                              {p.gameRole}
+                            </span>
+                            <span className="text-[9px] text-neutral-400 truncate">{p.category}</span>
+                          </div>
                         </div>
                       </div>
                       {isSelected && (
-                        <span className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_6px_#00f0ff]" />
+                        <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_8px_#00f0ff]" />
                       )}
                     </button>
                   );

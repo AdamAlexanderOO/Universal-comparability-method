@@ -6,7 +6,12 @@ export type MosaicCharacterType =
   | 'GOLIATH_TITAN'
   | 'CYBER_DRONE'
   | 'SENTINEL_DROID'
-  | 'STARFIGHTER_INTERCEPTOR';
+  | 'STARFIGHTER_INTERCEPTOR'
+  | 'CRUISER_BOSS'
+  | 'PLASMA_RIFLE'
+  | 'CYBER_PILOT'
+  | 'MECH_ARMOR'
+  | 'ROMAN_CYBER_MOSAIC';
 
 export interface MosaicTextureOptions {
   width?: number;
@@ -16,10 +21,47 @@ export interface MosaicTextureOptions {
   secondaryGlow?: string;
   groutIntensity?: number;
   tileSize?: number;
+  preservePaintingDetail?: boolean; // Keep high-res hand-drawn painterly brushwork with mosaic overlay
+}
+
+// Map character types to high-resolution concept art images
+export const CHARACTER_IMAGE_ASSETS: Record<MosaicCharacterType, string> = {
+  HERO_MECH_FRONT: '/src/assets/images/player_mech_hero_1787187990637.jpg',
+  HERO_MECH_BACK: '/src/assets/images/player_mech_rear_1787188006708.jpg',
+  GOLIATH_TITAN: '/src/assets/images/enemy_tps_mech_1787090446411.jpg',
+  CYBER_DRONE: '/src/assets/images/enemy_drone_fighter_1787090400681.jpg',
+  SENTINEL_DROID: '/src/assets/images/enemy_fps_sentinel_1787090428781.jpg',
+  STARFIGHTER_INTERCEPTOR: '/src/assets/images/space_starfighter_hero_1787089887255.jpg',
+  CRUISER_BOSS: '/src/assets/images/enemy_cruiser_boss_1787090414452.jpg',
+  PLASMA_RIFLE: '/src/assets/images/cyber_plasma_rifle_1787089913135.jpg',
+  CYBER_PILOT: '/src/assets/images/cyber_pilot_hero_1787089924400.jpg',
+  MECH_ARMOR: '/src/assets/images/cyber_mech_armor_1787089900058.jpg',
+  ROMAN_CYBER_MOSAIC: '/src/assets/images/roman_cyber_mosaic_1787188021928.jpg',
+};
+
+// Global Image Cache for fast, zero-lag character texture instantiation
+const imageCache: Map<string, HTMLImageElement> = new Map();
+
+function preloadImage(src: string): HTMLImageElement {
+  if (imageCache.has(src)) {
+    return imageCache.get(src)!;
+  }
+  const img = new Image();
+  img.crossOrigin = 'anonymous';
+  img.src = src;
+  imageCache.set(src, img);
+  return img;
+}
+
+// Eagerly preload all character image assets
+if (typeof window !== 'undefined') {
+  Object.values(CHARACTER_IMAGE_ASSETS).forEach((src) => {
+    preloadImage(src);
+  });
 }
 
 /**
- * Procedural Vector Drawing for Cyber / Roman Character Silhouettes
+ * Procedural Vector Fallback Drawing for Cyber / Roman Character Silhouettes
  */
 function drawCharacterVectorToCanvas(
   ctx: CanvasRenderingContext2D,
@@ -31,7 +73,7 @@ function drawCharacterVectorToCanvas(
   const cx = w / 2;
   const cy = h / 2;
 
-  if (type === 'HERO_MECH_FRONT' || type === 'HERO_MECH_BACK') {
+  if (type === 'HERO_MECH_FRONT' || type === 'HERO_MECH_BACK' || type === 'MECH_ARMOR') {
     const isBack = type === 'HERO_MECH_BACK';
 
     // Outer Shoulder Pauldrons
@@ -105,10 +147,9 @@ function drawCharacterVectorToCanvas(
     ctx.fillStyle = '#00ffff';
     ctx.fillRect(cx + 90, cy - 155, 16, 20);
 
-  } else if (type === 'GOLIATH_TITAN') {
+  } else if (type === 'GOLIATH_TITAN' || type === 'CRUISER_BOSS') {
     // Heavy Crimson Rogue Goliath Titan Mech
     ctx.fillStyle = '#4a0815';
-    // Colossal Armor Plates
     ctx.beginPath();
     ctx.moveTo(cx - 200, cy - 120);
     ctx.lineTo(cx - 100, cy - 190);
@@ -119,7 +160,7 @@ function drawCharacterVectorToCanvas(
     ctx.closePath();
     ctx.fill();
 
-    // Crimson Eye Visor & Aggressive Horns
+    // Crimson Eye Visor
     ctx.fillStyle = '#ff0033';
     ctx.beginPath();
     ctx.moveTo(cx - 60, cy - 110);
@@ -134,23 +175,13 @@ function drawCharacterVectorToCanvas(
     ctx.arc(cx, cy - 10, 45, 0, Math.PI * 2);
     ctx.fill();
 
-    // Massive Quad-Piston Legs
+    // Quad-Piston Legs
     ctx.fillStyle = '#26040b';
     ctx.fillRect(cx - 120, cy + 60, 70, 150);
     ctx.fillRect(cx + 50, cy + 60, 70, 150);
-
     ctx.fillStyle = '#ff0055';
     ctx.fillRect(cx - 135, cy + 190, 100, 30);
     ctx.fillRect(cx + 35, cy + 190, 100, 30);
-
-    // Heavy Missile Battery Pods
-    ctx.fillStyle = '#800c22';
-    for (let r = 0; r < 3; r++) {
-      for (let c = 0; c < 3; c++) {
-        ctx.fillRect(cx - 180 + c * 16, cy - 160 + r * 16, 10, 10);
-        ctx.fillRect(cx + 140 + c * 16, cy - 160 + r * 16, 10, 10);
-      }
-    }
 
   } else if (type === 'CYBER_DRONE') {
     // Sleek Tri-Rotor Recon Drone
@@ -159,7 +190,6 @@ function drawCharacterVectorToCanvas(
     ctx.arc(cx, cy, 55, 0, Math.PI * 2);
     ctx.fill();
 
-    // Tri-Wing Stabilizers
     for (let i = 0; i < 3; i++) {
       const angle = (i * Math.PI * 2) / 3 - Math.PI / 2;
       const wx = cx + Math.cos(angle) * 120;
@@ -172,22 +202,15 @@ function drawCharacterVectorToCanvas(
       ctx.lineTo(wx, wy);
       ctx.stroke();
 
-      // Rotor Pod
       ctx.fillStyle = '#00ffff';
       ctx.beginPath();
       ctx.arc(wx, wy, 26, 0, Math.PI * 2);
       ctx.fill();
     }
 
-    // Central Cyan Optics Lens
     ctx.fillStyle = '#00ffff';
     ctx.beginPath();
     ctx.arc(cx, cy, 28, 0, Math.PI * 2);
-    ctx.fill();
-
-    ctx.fillStyle = '#ffffff';
-    ctx.beginPath();
-    ctx.arc(cx - 6, cy - 6, 8, 0, Math.PI * 2);
     ctx.fill();
 
   } else if (type === 'SENTINEL_DROID') {
@@ -204,13 +227,11 @@ function drawCharacterVectorToCanvas(
     ctx.closePath();
     ctx.fill();
 
-    // Internal Purple Emissive Shield Generator
     ctx.fillStyle = '#d946ef';
     ctx.beginPath();
     ctx.arc(cx, cy, 40, 0, Math.PI * 2);
     ctx.fill();
 
-    // Laser Optics Bar
     ctx.fillStyle = '#ff0055';
     ctx.fillRect(cx - 45, cy - 8, 90, 16);
 
@@ -218,25 +239,23 @@ function drawCharacterVectorToCanvas(
     // Aerodynamic Cyber Space Interceptor
     ctx.fillStyle = '#0f243a';
     ctx.beginPath();
-    ctx.moveTo(cx, cy - 180); // Nose cone
+    ctx.moveTo(cx, cy - 180);
     ctx.lineTo(cx + 40, cy - 40);
-    ctx.lineTo(cx + 170, cy + 80); // Right Wingtip
+    ctx.lineTo(cx + 170, cy + 80);
     ctx.lineTo(cx + 120, cy + 120);
     ctx.lineTo(cx + 40, cy + 90);
-    ctx.lineTo(cx, cy + 130); // Tail
+    ctx.lineTo(cx, cy + 130);
     ctx.lineTo(cx - 40, cy + 90);
     ctx.lineTo(cx - 120, cy + 120);
-    ctx.lineTo(cx - 170, cy + 80); // Left Wingtip
+    ctx.lineTo(cx - 170, cy + 80);
     ctx.lineTo(cx - 40, cy - 40);
     ctx.closePath();
     ctx.fill();
 
-    // Twin Wingtip Ion Blasters
     ctx.fillStyle = '#00f0ff';
     ctx.fillRect(cx - 175, cy + 20, 12, 70);
     ctx.fillRect(cx + 163, cy + 20, 12, 70);
 
-    // Glowing Canopy Visor
     ctx.fillStyle = '#00ffff';
     ctx.beginPath();
     ctx.moveTo(cx, cy - 110);
@@ -245,48 +264,79 @@ function drawCharacterVectorToCanvas(
     ctx.closePath();
     ctx.fill();
 
-    // Twin Ion Plasma Afterburners
     ctx.fillStyle = '#ffaa00';
     ctx.beginPath();
     ctx.arc(cx - 28, cy + 105, 14, 0, Math.PI * 2);
     ctx.arc(cx + 28, cy + 105, 14, 0, Math.PI * 2);
     ctx.fill();
+  } else if (type === 'PLASMA_RIFLE') {
+    // Cyber Plasma Rifle Vector
+    ctx.fillStyle = '#1e293b';
+    ctx.fillRect(cx - 140, cy - 40, 280, 80);
+    ctx.fillStyle = '#00f0ff';
+    ctx.fillRect(cx - 120, cy - 15, 240, 30);
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(cx + 100, cy - 8, 50, 16);
+  } else {
+    // Default portrait / mosaic
+    ctx.fillStyle = '#334155';
+    ctx.beginPath();
+    ctx.arc(cx, cy, 120, 0, Math.PI * 2);
+    ctx.fill();
   }
 }
 
 /**
- * Transforms an image buffer into authentic Level 4 Roman Mosaic / Quantum Transistor Matrix
+ * High-Quality Silhouette Cutout & Roman Mosaic Processor for Hand-Drawn Artwork
  */
-export function createLevel4MosaicTexture(
-  type: MosaicCharacterType,
+function renderHandDrawnMosaicToCanvas(
+  outCtx: CanvasRenderingContext2D,
+  img: HTMLImageElement,
+  w: number,
+  h: number,
   options: MosaicTextureOptions = {}
-): THREE.CanvasTexture {
-  const w = options.width || 512;
-  const h = options.height || 512;
-  const tileSize = options.tileSize || 3; // Level 4 fine micro-tesserae
+) {
+  const tileSize = options.tileSize || 3;
   const tileStyle = options.tileStyle || 'ROMAN_STONE';
-  const groutIntensity = options.groutIntensity ?? 65;
+  const groutIntensity = options.groutIntensity ?? 50;
+  const primaryGlow = options.primaryGlow || '#00f0ff';
 
-  // Step 1: Render high-fidelity vector source to offscreen canvas
-  const srcCanvas = document.createElement('canvas');
-  srcCanvas.width = w;
-  srcCanvas.height = h;
-  const srcCtx = srcCanvas.getContext('2d')!;
-  drawCharacterVectorToCanvas(srcCtx, type, w, h);
-  const srcData = srcCtx.getImageData(0, 0, w, h).data;
+  // Step 1: Draw hand-drawn source image to an offscreen buffer
+  const offCanvas = document.createElement('canvas');
+  offCanvas.width = w;
+  offCanvas.height = h;
+  const offCtx = offCanvas.getContext('2d', { willReadFrequently: true })!;
+  offCtx.clearRect(0, 0, w, h);
 
-  // Step 2: Render Level 4 Roman Mosaic Tesserae to Output Canvas
-  const outCanvas = document.createElement('canvas');
-  outCanvas.width = w;
-  outCanvas.height = h;
-  const outCtx = outCanvas.getContext('2d')!;
+  // Maintain aspect ratio and center image
+  const imgAspect = img.naturalWidth / img.naturalHeight;
+  const canvasAspect = w / h;
+  let drawW = w;
+  let drawH = h;
+  let drawX = 0;
+  let drawY = 0;
+
+  if (imgAspect > canvasAspect) {
+    drawW = w;
+    drawH = w / imgAspect;
+    drawY = (h - drawH) / 2;
+  } else {
+    drawH = h;
+    drawW = h * imgAspect;
+    drawX = (w - drawW) / 2;
+  }
+
+  offCtx.drawImage(img, drawX, drawY, drawW, drawH);
+  const srcData = offCtx.getImageData(0, 0, w, h).data;
+
+  // Clear output canvas
   outCtx.clearRect(0, 0, w, h);
 
   const cols = Math.ceil(w / tileSize);
   const rows = Math.ceil(h / tileSize);
-  const grout = (groutIntensity / 100) * 0.8;
-  const drawW = Math.max(1, tileSize - grout);
-  const drawH = Math.max(1, tileSize - grout);
+  const grout = (groutIntensity / 100) * 0.75;
+  const tileDrawW = Math.max(1, tileSize - grout);
+  const tileDrawH = Math.max(1, tileSize - grout);
 
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
@@ -297,52 +347,102 @@ export function createLevel4MosaicTexture(
       const sampleY = Math.min(h - 1, Math.floor(y + tileSize / 2));
       const idx = (sampleY * w + sampleX) * 4;
 
-      const alpha = srcData[idx + 3];
-      if (alpha < 20) continue; // Transparent pixel cutout
-
       const red = srcData[idx];
       const green = srcData[idx + 1];
       const blue = srcData[idx + 2];
-      const brightness = (red + green + blue) / 3;
+      const initialAlpha = srcData[idx + 3];
 
-      // Color Palette Quantization & Micro stone variation
-      const noise = ((c * 17 + r * 37) % 19) - 9;
+      if (initialAlpha < 10) continue;
+
+      // Smart Foreground Character Silhouette Masking (Chroma/Dark Keying)
+      const brightness = 0.299 * red + 0.587 * green + 0.114 * blue;
+      const distFromCenter = Math.hypot((sampleX - w / 2) / (w / 2), (sampleY - h / 2) / (h / 2));
+
+      // Calculate opacity: background space/studio borders fade away; character armor & glows stay solid
+      let alpha = 1.0;
+      if (brightness < 18 && distFromCenter > 0.45) {
+        alpha = 0.0;
+      } else if (brightness < 32 && distFromCenter > 0.6) {
+        alpha = Math.max(0, (brightness - 18) / 14);
+      } else if (brightness < 22) {
+        alpha = Math.max(0.15, brightness / 22);
+      }
+
+      if (alpha <= 0.02) continue;
+
+      // Enhance Hand-Drawn Color Saturation & Micro-Tessera Variation
+      const noise = ((c * 23 + r * 41) % 15) - 7;
       const finalR = Math.max(0, Math.min(255, red + noise));
       const finalG = Math.max(0, Math.min(255, green + noise));
       const finalB = Math.max(0, Math.min(255, blue + noise));
 
-      outCtx.fillStyle = `rgba(${finalR}, ${finalG}, ${finalB}, ${alpha / 255})`;
+      outCtx.fillStyle = `rgba(${finalR}, ${finalG}, ${finalB}, ${alpha})`;
 
       if (tileStyle === 'ROMAN_STONE') {
-        // Rounded Micro Tesserae Stone Block
-        outCtx.fillRect(x, y, drawW, drawH);
+        // Authentic Level 4 Roman Tesserae Stone Block
+        outCtx.fillRect(x, y, tileDrawW, tileDrawH);
 
-        // Sub-pixel Chamfer Highlight
-        if (brightness > 90) {
-          outCtx.fillStyle = `rgba(255, 255, 255, ${0.22 * (brightness / 255)})`;
-          outCtx.fillRect(x, y, drawW, 1);
-          outCtx.fillRect(x, y, 1, drawH);
+        // Sub-pixel Stone Chamfer / Bevel Highlight
+        if (brightness > 60) {
+          outCtx.fillStyle = `rgba(255, 255, 255, ${0.18 * (brightness / 255) * alpha})`;
+          outCtx.fillRect(x, y, tileDrawW, 0.9);
+          outCtx.fillRect(x, y, 0.9, tileDrawH);
         }
       } else if (tileStyle === 'QUANTUM_TRANSISTOR') {
-        // Quantum Transistor Gate Matrix with Micro-dot contact
-        outCtx.fillRect(x, y, drawW, drawH);
-        if (brightness > 120) {
-          outCtx.fillStyle = options.primaryGlow || '#00f0ff';
-          outCtx.fillRect(x + drawW / 2 - 0.5, y + drawH / 2 - 0.5, 1, 1);
+        // Quantum Transistor Matrix with Gate Micro-dot
+        outCtx.fillRect(x, y, tileDrawW, tileDrawH);
+        if (brightness > 110) {
+          outCtx.fillStyle = primaryGlow;
+          outCtx.fillRect(x + tileDrawW / 2 - 0.5, y + tileDrawH / 2 - 0.5, 1, 1);
         }
       } else {
-        // NEON CIRCUIT
-        outCtx.fillRect(x, y, drawW, drawH);
+        outCtx.fillRect(x, y, tileDrawW, tileDrawH);
       }
     }
   }
+}
 
-  // Create High-Fidelity Three.js Canvas Texture
+/**
+ * Transforms any character type or hand-drawn artwork into an authentic Level 4 Roman Mosaic Texture
+ */
+export function createLevel4MosaicTexture(
+  type: MosaicCharacterType,
+  options: MosaicTextureOptions = {}
+): THREE.CanvasTexture {
+  const w = options.width || 512;
+  const h = options.height || 512;
+
+  const outCanvas = document.createElement('canvas');
+  outCanvas.width = w;
+  outCanvas.height = h;
+  const outCtx = outCanvas.getContext('2d', { willReadFrequently: true })!;
+
+  // Create Three.js texture handle
   const texture = new THREE.CanvasTexture(outCanvas);
   texture.generateMipmaps = true;
   texture.minFilter = THREE.LinearMipmapLinearFilter;
   texture.magFilter = THREE.LinearFilter;
+
+  // First draw high-fidelity procedural vector fallback
+  drawCharacterVectorToCanvas(outCtx, type, w, h);
   texture.needsUpdate = true;
+
+  // Then load & render the authentic hand-drawn concept artwork
+  const assetSrc = CHARACTER_IMAGE_ASSETS[type];
+  if (assetSrc) {
+    const img = preloadImage(assetSrc);
+
+    const applyHandDrawnArt = () => {
+      renderHandDrawnMosaicToCanvas(outCtx, img, w, h, options);
+      texture.needsUpdate = true;
+    };
+
+    if (img.complete && img.naturalWidth > 0) {
+      applyHandDrawnArt();
+    } else {
+      img.onload = applyHandDrawnArt;
+    }
+  }
 
   return texture;
 }
@@ -351,12 +451,13 @@ export function createLevel4MosaicTexture(
  * Creates a Pristine Level-4 Mosaic Character 3D Mesh without clunky box underlays
  */
 export function createPristineMosaicCharacter(
-  type: 'HERO_MECH' | 'GOLIATH' | 'CYBER_DRONE',
+  type: 'HERO_MECH' | 'GOLIATH' | 'CYBER_DRONE' | 'SENTINEL',
   materials: {
     heroFrontTexture: THREE.CanvasTexture;
     heroBackTexture: THREE.CanvasTexture;
     goliathTexture: THREE.CanvasTexture;
     droneTexture: THREE.CanvasTexture;
+    sentinelTexture?: THREE.CanvasTexture;
   }
 ): THREE.Group {
   const root = new THREE.Group();
@@ -366,32 +467,32 @@ export function createPristineMosaicCharacter(
     const legsGroup = new THREE.Group();
 
     // Dual-Sided High-Resolution Level 4 Roman Mosaic Billboard Core
-    const planeGeo = new THREE.PlaneGeometry(2.8, 3.2);
+    const planeGeo = new THREE.PlaneGeometry(3.0, 3.4);
 
     // Front Mosaic Plaque
     const frontMat = new THREE.MeshStandardMaterial({
       map: materials.heroFrontTexture,
       transparent: true,
-      alphaTest: 0.1,
-      roughness: 0.35,
-      metalness: 0.8,
+      alphaTest: 0.08,
+      roughness: 0.25,
+      metalness: 0.85,
       side: THREE.FrontSide,
     });
     const frontMesh = new THREE.Mesh(planeGeo, frontMat);
-    frontMesh.position.set(0, 1.6, 0.02);
+    frontMesh.position.set(0, 1.7, 0.02);
     torsoGroup.add(frontMesh);
 
     // Rear Mosaic Plaque with Thruster Ports
     const backMat = new THREE.MeshStandardMaterial({
       map: materials.heroBackTexture,
       transparent: true,
-      alphaTest: 0.1,
-      roughness: 0.35,
-      metalness: 0.8,
+      alphaTest: 0.08,
+      roughness: 0.25,
+      metalness: 0.85,
       side: THREE.BackSide,
     });
     const backMesh = new THREE.Mesh(planeGeo, backMat);
-    backMesh.position.set(0, 1.6, -0.02);
+    backMesh.position.set(0, 1.7, -0.02);
     torsoGroup.add(backMesh);
 
     // 3D Level-4 Mosaic Glowing Reactor Core
@@ -399,7 +500,7 @@ export function createPristineMosaicCharacter(
       new THREE.SphereGeometry(0.18, 16, 16),
       new THREE.MeshBasicMaterial({ color: 0x00f0ff })
     );
-    coreMesh.position.set(0, 1.5, 0.05);
+    coreMesh.position.set(0, 1.55, 0.06);
     torsoGroup.add(coreMesh);
 
     // Twin Level-4 Plasma Thruster Nozzles
@@ -452,11 +553,11 @@ export function createPristineMosaicCharacter(
   }
 
   if (type === 'GOLIATH') {
-    // Pure Level 4 Roman Mosaic Goliath Boss Mech - Clean Cutout, No Box Collision Overlay Underneath
+    // Pure Level 4 Roman Mosaic Goliath Boss Mech
     const goliathMat = new THREE.MeshStandardMaterial({
       map: materials.goliathTexture,
       transparent: true,
-      alphaTest: 0.1,
+      alphaTest: 0.08,
       roughness: 0.25,
       metalness: 0.85,
       side: THREE.DoubleSide,
@@ -485,11 +586,11 @@ export function createPristineMosaicCharacter(
     return root;
   }
 
-  // CYBER_DRONE
+  // CYBER_DRONE / SENTINEL
   const droneMat = new THREE.MeshStandardMaterial({
-    map: materials.droneTexture,
+    map: type === 'SENTINEL' && materials.sentinelTexture ? materials.sentinelTexture : materials.droneTexture,
     transparent: true,
-    alphaTest: 0.1,
+    alphaTest: 0.08,
     roughness: 0.2,
     metalness: 0.9,
     side: THREE.DoubleSide,
@@ -500,7 +601,7 @@ export function createPristineMosaicCharacter(
 
   const droneCore = new THREE.Mesh(
     new THREE.SphereGeometry(0.18, 12, 12),
-    new THREE.MeshBasicMaterial({ color: 0x00f0ff })
+    new THREE.MeshBasicMaterial({ color: type === 'SENTINEL' ? 0xd946ef : 0x00f0ff })
   );
   droneCore.position.set(0, 1.3, 0.02);
   root.add(droneCore);
@@ -515,3 +616,4 @@ export function createPristineMosaicCharacter(
 
   return root;
 }
+

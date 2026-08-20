@@ -11,7 +11,8 @@ export type LightPreset =
   | 'SOLAR_AMBER' 
   | 'BIOLUMINESCENT' 
   | 'GAMMA_PULSE'
-  | 'HEAT_TREATED';
+  | 'HEAT_TREATED'
+  | 'SAKURA_PINK';
 
 export interface LightProtocolData {
   preset: LightPreset;
