@@ -1,8 +1,21 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Play, Zap, Power, Sliders, Sun, Volume2, VolumeX, Sparkles, Cpu, Activity } from 'lucide-react';
+import {
+  Play,
+  Zap,
+  Power,
+  Sliders,
+  Sun,
+  Volume2,
+  VolumeX,
+  Sparkles,
+  Cpu,
+  Activity,
+} from 'lucide-react';
 import { LightPreset, LightProtocolData, SimulationMode } from '../types';
+import { AppThemeConfig, APP_THEMES } from '../utils/theme';
 import { sounds } from '../utils/soundEffects';
+import { haptics } from '../utils/haptics';
 
 interface AuroraMachineConsoleProps {
   powerOn: boolean;
@@ -16,6 +29,7 @@ interface AuroraMachineConsoleProps {
   onOpenSettings: () => void;
   soundEnabled: boolean;
   onToggleSound: () => void;
+  theme?: AppThemeConfig;
 }
 
 export const AuroraMachineConsole: React.FC<AuroraMachineConsoleProps> = ({
@@ -30,17 +44,20 @@ export const AuroraMachineConsole: React.FC<AuroraMachineConsoleProps> = ({
   onOpenSettings,
   soundEnabled,
   onToggleSound,
+  theme = APP_THEMES.CRIMSON_CYBERPUNK,
 }) => {
   const [selectedMode, setSelectedMode] = useState<SimulationMode>('SIMULATE');
   const [sliderHover, setSliderHover] = useState(false);
 
   const handleSimulateClick = () => {
     sounds.playSimulatePulse();
+    haptics.trigger('heavy');
     onRunSimulation(selectedMode);
   };
 
   const handleLightClick = () => {
     sounds.playSpectrumLoad();
+    haptics.trigger('pulse');
     onCycleLight();
   };
 
@@ -48,6 +65,7 @@ export const AuroraMachineConsole: React.FC<AuroraMachineConsoleProps> = ({
     const val = parseFloat(e.target.value);
     onFluxChange(val);
     sounds.playGearTick();
+    haptics.trigger('light');
   };
 
   const cycleMode = () => {
@@ -61,12 +79,18 @@ export const AuroraMachineConsole: React.FC<AuroraMachineConsoleProps> = ({
     const nextIdx = (modes.indexOf(selectedMode) + 1) % modes.length;
     setSelectedMode(modes[nextIdx]);
     sounds.playClick(620);
+    haptics.trigger('click');
   };
 
   return (
     <div
       id="aurora-machine-chassis"
-      className="relative w-full max-w-sm select-none bg-[#0A0A0A] p-5 border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.9)] transition-all"
+      className="relative w-full max-w-sm select-none p-5 border shadow-[0_20px_50px_rgba(0,0,0,0.9)] transition-all font-mono"
+      style={{
+        backgroundColor: theme.bgDark,
+        borderColor: 'rgba(255, 255, 255, 0.1)',
+        boxShadow: `0 20px 50px rgba(0,0,0,0.9), 0 0 15px ${theme.glowRgba}`,
+      }}
     >
       {/* Machined chassis corner screw bolts (Minimalist Precision Pins) */}
       <div className="absolute top-2.5 left-2.5 w-2 h-2 bg-neutral-800 border border-white/20 flex items-center justify-center">
@@ -84,14 +108,20 @@ export const AuroraMachineConsole: React.FC<AuroraMachineConsoleProps> = ({
 
       {/* Top Header Label */}
       <div className="text-center pt-1 pb-3 border-b border-white/10 mb-4">
-        <div className="text-red-600 font-mono text-[10px] uppercase tracking-[0.3em] font-bold">
-          Hardware Deck 02
+        <div
+          className="font-mono text-[10px] uppercase tracking-[0.3em] font-bold"
+          style={{ color: theme.primary }}
+        >
+          Hardware Deck 02 // {theme.name.split(' ')[0]}
         </div>
         <h2 className="font-mono tracking-[0.25em] text-base font-black uppercase text-white mt-0.5">
           AURORA MACHINE
         </h2>
         <div className="flex items-center justify-center gap-2 mt-1">
-          <span className={`inline-block w-1.5 h-1.5 ${powerOn ? 'bg-red-600' : 'bg-neutral-700'}`} />
+          <span
+            className="inline-block w-1.5 h-1.5 rounded-full"
+            style={{ backgroundColor: powerOn ? theme.primary : '#404040' }}
+          />
           <span className="text-[9px] font-mono tracking-widest text-neutral-400">
             {powerOn ? `SYSTEM ONLINE // ${currentLight.name}` : 'STANDBY MODE'}
           </span>
@@ -115,7 +145,8 @@ export const AuroraMachineConsole: React.FC<AuroraMachineConsoleProps> = ({
               {[40, 70, 95, 60, 85, 100, 75, 45, 90, 65, 30].map((h, i) => (
                 <motion.div
                   key={i}
-                  className={`w-1 ${i % 2 === 0 ? 'bg-red-600' : 'bg-white'}`}
+                  className="w-1 rounded-t-sm"
+                  style={{ backgroundColor: i % 2 === 0 ? theme.primary : '#ffffff' }}
                   animate={{
                     height: isSimulating ? [6, h * 0.26, 4] : [4, (h * fluxFrequency) / 450 + 4, 4],
                   }}
@@ -133,7 +164,8 @@ export const AuroraMachineConsole: React.FC<AuroraMachineConsoleProps> = ({
                 scale: isSimulating ? [1, 1.03, 1] : 1,
               }}
               transition={{ repeat: Infinity, duration: 1.2 }}
-              className="font-mono text-lg sm:text-xl font-black tracking-widest text-white cursor-pointer hover:text-red-500 transition-colors"
+              className="font-mono text-lg sm:text-xl font-black tracking-widest text-white cursor-pointer transition-colors hover:opacity-90"
+              style={{ color: isSimulating ? theme.primary : '#ffffff' }}
               onClick={handleSimulateClick}
             >
               {isSimulating ? 'PROCESSING...' : selectedMode}
@@ -155,6 +187,7 @@ export const AuroraMachineConsole: React.FC<AuroraMachineConsoleProps> = ({
       <div className="grid grid-cols-2 gap-2.5">
         {/* Button 1: LOAD.LIGHT */}
         <button
+          type="button"
           id="btn-load-light-primary"
           onClick={handleLightClick}
           disabled={!powerOn}
@@ -172,17 +205,23 @@ export const AuroraMachineConsole: React.FC<AuroraMachineConsoleProps> = ({
 
         {/* Button 2: SIMULATE (Mode switch) */}
         <button
+          type="button"
           id="btn-simulate-mode"
           onClick={cycleMode}
           disabled={!powerOn}
           className={`group relative flex items-center justify-center border py-2.5 px-2 font-mono text-xs font-bold tracking-wider transition-all duration-150 active:scale-95 ${
             powerOn
-              ? 'border-red-600/40 bg-red-950/20 text-red-500 hover:bg-red-900/30 hover:border-red-600'
+              ? 'hover:bg-white/10'
               : 'border-white/5 bg-transparent text-neutral-600 opacity-40 cursor-not-allowed'
           }`}
+          style={{
+            borderColor: powerOn ? theme.borderPrimary : undefined,
+            backgroundColor: powerOn ? theme.badgeBg : undefined,
+            color: powerOn ? theme.primary : undefined,
+          }}
         >
           <div className="flex items-center gap-1.5">
-            <Activity className="w-3.5 h-3.5 text-red-500" />
+            <Activity className="w-3.5 h-3.5" style={{ color: theme.primary }} />
             <span>SIMULATE</span>
           </div>
         </button>
@@ -207,16 +246,19 @@ export const AuroraMachineConsole: React.FC<AuroraMachineConsoleProps> = ({
               value={fluxFrequency}
               onChange={handleSliderInput}
               disabled={!powerOn}
-              className="w-full h-1 bg-neutral-800 rounded-none appearance-none cursor-pointer accent-red-600"
+              className="w-full h-1 bg-neutral-800 rounded-none appearance-none cursor-pointer"
+              style={{ accentColor: theme.primary }}
             />
           </div>
         </div>
 
         {/* Button 4: SETTINGS */}
         <button
+          type="button"
           id="btn-settings"
           onClick={() => {
             sounds.playClick(720);
+            haptics.trigger('click');
             onOpenSettings();
           }}
           disabled={!powerOn}
@@ -234,6 +276,7 @@ export const AuroraMachineConsole: React.FC<AuroraMachineConsoleProps> = ({
 
         {/* Button 5: LOAD .LIGHT (Secondary Spectrum Injector) */}
         <button
+          type="button"
           id="btn-load-light-secondary"
           onClick={handleLightClick}
           disabled={!powerOn}
@@ -251,16 +294,23 @@ export const AuroraMachineConsole: React.FC<AuroraMachineConsoleProps> = ({
 
         {/* Button 6: POWER */}
         <button
+          type="button"
           id="btn-power-main"
           onClick={() => {
             sounds.playPowerToggle(!powerOn);
+            haptics.trigger('heavy');
             onTogglePower();
           }}
           className={`flex items-center justify-center border py-2.5 px-2 font-mono text-xs font-bold tracking-wider transition-all duration-150 active:scale-95 ${
             powerOn
-              ? 'border-red-600 bg-red-600 text-white shadow-[0_0_15px_rgba(220,38,38,0.4)] hover:bg-red-700'
+              ? 'text-white hover:opacity-90'
               : 'border-white/20 bg-white/5 text-neutral-400 hover:border-white/40 hover:text-white'
           }`}
+          style={{
+            backgroundColor: powerOn ? theme.primary : undefined,
+            borderColor: powerOn ? theme.primary : undefined,
+            boxShadow: powerOn ? `0 0 15px ${theme.glowRgba}` : undefined,
+          }}
         >
           <div className="flex items-center gap-1.5">
             <Power className="w-3.5 h-3.5" />
@@ -272,17 +322,31 @@ export const AuroraMachineConsole: React.FC<AuroraMachineConsoleProps> = ({
       {/* Bottom Console Audio & Status Quick-Toggles */}
       <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-[10px] font-mono text-neutral-400">
         <button
-          onClick={onToggleSound}
+          type="button"
+          onClick={() => {
+            haptics.trigger('click');
+            onToggleSound();
+          }}
           className="flex items-center gap-1.5 hover:text-white transition-colors"
           title={soundEnabled ? 'Mute Cyber Audio' : 'Unmute Cyber Audio'}
         >
-          {soundEnabled ? <Volume2 className="w-3.5 h-3.5 text-white" /> : <VolumeX className="w-3.5 h-3.5 text-neutral-600" />}
+          {soundEnabled ? (
+            <Volume2 className="w-3.5 h-3.5 text-white" />
+          ) : (
+            <VolumeX className="w-3.5 h-3.5 text-neutral-600" />
+          )}
           <span>{soundEnabled ? 'AUDIO: SYNTH' : 'AUDIO: MUTED'}</span>
         </button>
 
         <div className="flex items-center gap-2">
           <span className="text-[9px] text-neutral-500">REV. 4.08-X</span>
-          <span className={`w-1.5 h-1.5 ${powerOn ? 'bg-red-600 animate-ping' : 'bg-neutral-700'}`} />
+          <span
+            className="w-1.5 h-1.5 rounded-full"
+            style={{
+              backgroundColor: powerOn ? theme.primary : '#404040',
+              boxShadow: powerOn ? `0 0 6px ${theme.primary}` : undefined,
+            }}
+          />
         </div>
       </div>
     </div>

@@ -3,6 +3,8 @@ import { motion } from 'motion/react';
 import { Shield, Heart, Cpu, Flame, Database, Radio, Droplet, ArrowRight, ArrowLeft, Zap, Sparkles } from 'lucide-react';
 import { LightProtocolData, SubsystemStatus } from '../types';
 import { sounds } from '../utils/soundEffects';
+import { haptics } from '../utils/haptics';
+import { AppThemeConfig, APP_THEMES } from '../utils/theme';
 
 interface LightProtocolPCBProps {
   powerOn: boolean;
@@ -12,6 +14,7 @@ interface LightProtocolPCBProps {
   onOverchargeCore: () => void;
   activeNode: string | null;
   fluxFrequency: number;
+  theme?: AppThemeConfig;
 }
 
 export const LightProtocolPCB: React.FC<LightProtocolPCBProps> = ({
@@ -22,6 +25,7 @@ export const LightProtocolPCB: React.FC<LightProtocolPCBProps> = ({
   onOverchargeCore,
   activeNode,
   fluxFrequency,
+  theme = APP_THEMES.CRIMSON_CYBERPUNK,
 }) => {
   const [corePulsing, setCorePulsing] = useState(false);
 
@@ -29,6 +33,7 @@ export const LightProtocolPCB: React.FC<LightProtocolPCBProps> = ({
     if (!powerOn) return;
     setCorePulsing(true);
     sounds.playSimulatePulse();
+    haptics.trigger('overcharge');
     onOverchargeCore();
     setTimeout(() => setCorePulsing(false), 800);
   };
@@ -36,6 +41,7 @@ export const LightProtocolPCB: React.FC<LightProtocolPCBProps> = ({
   const handleNodeClick = (nodeName: string) => {
     if (!powerOn) return;
     sounds.playClick(940);
+    haptics.trigger('click');
     onSelectNode(nodeName);
   };
 

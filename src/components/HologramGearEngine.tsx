@@ -3,6 +3,8 @@ import { motion } from 'motion/react';
 import { Layers, Eye, EyeOff, RotateCw, Cog, Box, Sparkles, SlidersHorizontal, ShieldCheck } from 'lucide-react';
 import { HologramEngineState, LightProtocolData } from '../types';
 import { sounds } from '../utils/soundEffects';
+import { haptics } from '../utils/haptics';
+import { AppThemeConfig, APP_THEMES } from '../utils/theme';
 
 interface HologramGearEngineProps {
   powerOn: boolean;
@@ -10,6 +12,7 @@ interface HologramGearEngineProps {
   currentLight: LightProtocolData;
   engineState: HologramEngineState;
   onUpdateState: (newState: Partial<HologramEngineState>) => void;
+  theme?: AppThemeConfig;
 }
 
 export const HologramGearEngine: React.FC<HologramGearEngineProps> = ({
@@ -18,11 +21,13 @@ export const HologramGearEngine: React.FC<HologramGearEngineProps> = ({
   currentLight,
   engineState,
   onUpdateState,
+  theme = APP_THEMES.CRIMSON_CYBERPUNK,
 }) => {
   const [selectedGear, setSelectedGear] = useState<string | null>(null);
 
   const toggleLayer = (layerKey: keyof HologramEngineState['visibleLayers']) => {
     sounds.playClick(840);
+    haptics.trigger('click');
     onUpdateState({
       visibleLayers: {
         ...engineState.visibleLayers,
@@ -40,6 +45,7 @@ export const HologramGearEngine: React.FC<HologramGearEngineProps> = ({
     ];
     const nextIdx = (modes.indexOf(engineState.viewMode) + 1) % modes.length;
     sounds.playClick(720);
+    haptics.trigger('click');
     onUpdateState({ viewMode: modes[nextIdx] });
   };
 
@@ -51,6 +57,7 @@ export const HologramGearEngine: React.FC<HologramGearEngineProps> = ({
     ];
     const nextIdx = (meshes.indexOf(engineState.meshType) + 1) % meshes.length;
     sounds.playClick(680);
+    haptics.trigger('click');
     onUpdateState({ meshType: meshes[nextIdx] });
   };
 

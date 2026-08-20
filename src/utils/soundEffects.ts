@@ -7,24 +7,32 @@ class CyberSoundEngine {
   private ctx: AudioContext | null = null;
   private enabled: boolean = true;
   private ambientGain: GainNode | null = null;
-  private ambientOsc: OscillatorNode | null = null;
+  private lastLaserTime: number = 0;
+  private lastDamageTime: number = 0;
+  private lastExplosionTime: number = 0;
 
   private initContext() {
     if (!this.ctx && typeof window !== 'undefined') {
       const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
       if (AudioCtx) {
-        this.ctx = new AudioCtx();
+        try {
+          this.ctx = new AudioCtx();
+        } catch (e) {}
       }
     }
     if (this.ctx && this.ctx.state === 'suspended') {
-      this.ctx.resume();
+      try {
+        this.ctx.resume().catch(() => {});
+      } catch (e) {}
     }
   }
 
   public setEnabled(val: boolean) {
     this.enabled = val;
     if (!val && this.ambientGain && this.ctx) {
-      this.ambientGain.gain.setValueAtTime(0, this.ctx.currentTime);
+      try {
+        this.ambientGain.gain.setValueAtTime(0, this.ctx.currentTime);
+      } catch (e) {}
     }
   }
 
@@ -38,12 +46,12 @@ class CyberSoundEngine {
   public playClick(freq = 880, type: OscillatorType = 'sine') {
     if (!this.enabled) return;
     this.initContext();
-    if (!this.ctx) return;
+    if (!this.ctx || this.ctx.state !== 'running') return;
 
     try {
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
-      
+
       osc.type = type;
       osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
       osc.frequency.exponentialRampToValueAtTime(freq * 0.4, this.ctx.currentTime + 0.05);
@@ -56,9 +64,7 @@ class CyberSoundEngine {
 
       osc.start();
       osc.stop(this.ctx.currentTime + 0.05);
-    } catch (e) {
-      // Audio autoplay policy catch
-    }
+    } catch (e) {}
   }
 
   /**
@@ -71,7 +77,6 @@ class CyberSoundEngine {
 
     try {
       const now = this.ctx.currentTime;
-      // High pitch drop
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
       const filter = this.ctx.createBiquadFilter();
@@ -95,7 +100,6 @@ class CyberSoundEngine {
       osc.start(now);
       osc.stop(now + 0.36);
 
-      // Add a sub-bass thump
       const subOsc = this.ctx.createOscillator();
       const subGain = this.ctx.createGain();
       subOsc.type = 'sine';
@@ -174,7 +178,7 @@ class CyberSoundEngine {
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(2093, now); // C7 note
+      osc.frequency.setValueAtTime(2093, now);
       gain.gain.setValueAtTime(0.1, now);
       gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
 
@@ -182,6 +186,120 @@ class CyberSoundEngine {
       gain.connect(this.ctx.destination);
       osc.start(now);
       osc.stop(now + 0.42);
+    } catch (e) {}
+  }
+
+  /**
+   * Action Game: High-tech Plasma Laser Pew (Rate limited)
+   */
+  public playLaserPew() {
+    if (!this.enabled) return;
+    this.initContext();
+    if (!this.ctx || this.ctx.state !== 'running') return;
+
+    const now = this.ctx.currentTime;
+    if (now - this.lastLaserTime < 0.08) return;
+    this.lastLaserTime = now;
+
+    try {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(880, now);
+      osc.frequency.exponentialRampToValueAtTime(110, now + 0.1);
+
+      gain.gain.setValueAtTime(0.08, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.11);
+    } catch (e) {}
+  }
+
+  /**
+   * Action Game: Armor Damage / Shield Impact Blip
+   */
+  public playDamageBlip() {
+    if (!this.enabled) return;
+    this.initContext();
+    if (!this.ctx || this.ctx.state !== 'running') return;
+
+    const now = this.ctx.currentTime;
+    if (now - this.lastDamageTime < 0.08) return;
+    this.lastDamageTime = now;
+
+    try {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(180, now);
+      osc.frequency.exponentialRampToValueAtTime(60, now + 0.07);
+
+      gain.gain.setValueAtTime(0.1, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.07);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.08);
+    } catch (e) {}
+  }
+
+  /**
+   * Action Game: Power-Up / Kill Combo Chime
+   */
+  public playPowerUpChime() {
+    if (!this.enabled) return;
+    this.initContext();
+    if (!this.ctx || this.ctx.state !== 'running') return;
+
+    try {
+      const now = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(440, now);
+      osc.frequency.setValueAtTime(659.25, now + 0.06);
+      osc.frequency.setValueAtTime(880, now + 0.12);
+
+      gain.gain.setValueAtTime(0.1, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.23);
+    } catch (e) {}
+  }
+
+  /**
+   * Action Game: Deep Explosion Boom
+   */
+  public playExplosionBoom() {
+    if (!this.enabled) return;
+    this.initContext();
+    if (!this.ctx || this.ctx.state !== 'running') return;
+
+    const now = this.ctx.currentTime;
+    if (now - this.lastExplosionTime < 0.12) return;
+    this.lastExplosionTime = now;
+
+    try {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(120, now);
+      osc.frequency.exponentialRampToValueAtTime(20, now + 0.35);
+
+      gain.gain.setValueAtTime(0.15, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.36);
     } catch (e) {}
   }
 
